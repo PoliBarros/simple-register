@@ -8,13 +8,14 @@ class LoginGUI:
     def __init__(self):
         # Main window.
         self.main_window = tkinter.Tk()
-        self.main_window.geometry('200x200')
+        self.main_window.geometry('400x150')
         self.main_window.title("Login")
 
         self.retunTypes = logService.getTypes()
 
         #Frames
         self.frame1 = tkinter.Frame(self.main_window)
+        self.separator = tkinter.Frame(self.main_window, height=2, bd=2, relief="sunken")
         self.frame2 = tkinter.Frame(self.main_window)
         self.frame3 = tkinter.Frame(self.main_window)
         self.frame4 = tkinter.Frame(self.main_window, height=2, bd=2, relief="sunken")
@@ -29,10 +30,10 @@ class LoginGUI:
 
         #Login data
         self.loginLabel = tkinter.Label(self.frame2, text='Login:')
-        self.loginEntry = tkinter.Entry(self.frame2, width=10)
+        self.loginEntry = tkinter.Entry(self.frame3, width=20)
 
         #Password data
-        self.password = tkinter.Label(self.frame3, text='Password:')
+        self.password = tkinter.Label(self.frame2, text='Password:')
         self.pwEntry = tkinter.Entry(self.frame3, width=10)
 
         #button
@@ -41,17 +42,20 @@ class LoginGUI:
 
         # packs
         self.frame1.pack(fill="x")
+        self.separator.pack(fill="x", padx=5, pady=5)
         self.frame2.pack(fill="x")
         self.frame3.pack(fill="x")
         self.frame4.pack(fill="x", padx=5, pady=5)
         self.frame5.pack(fill="x")
 
-        self.typeUserLabel.pack(side="left")
-        self.typeEntry.pack(side="left")
-        self.loginLabel.pack(side="left")
-        self.loginEntry.pack(side="left")
-        self.password.pack(side="left")
-        self.pwEntry.pack(side="left")
+        self.typeUserLabel.pack(side="left", fill="x")
+        self.typeEntry.pack(side="left", fill="both")
+
+        self.loginLabel.pack(side="left", fill="x")
+        self.loginEntry.pack(side="left", fill="both")
+
+        self.password.pack(side="left", fill="x", padx=141)
+        self.pwEntry.pack(side="left", fill="both")
 
         tkinter.mainloop()
 

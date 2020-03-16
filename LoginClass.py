@@ -19,6 +19,7 @@ class LoginClass:
 
 
 class UserTypes(enum.Enum):
-    ADM = 1
+    ADM = 0
+    COURSE = 1
     STUDENTS = 2
     PROFESSOR = 3
