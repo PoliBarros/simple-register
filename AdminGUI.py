@@ -2,19 +2,15 @@
 import tkinter
 from tkinter import ttk
 
+import  Enums as enum
 import LoginService as serv
 
 class AdminGUI():
 
-    def __init__(self):
-
-        # CONTANTS
-        self.COURSE = "COURSE"
-        self.PROFESSOR = "PROFESSOR"
-        self.STUDENT = "STUDENT"
+    def __init__(self, windows):
 
         # MAIN WINDOW
-        self.main_window = tkinter.Tk()
+        self.main_window = windows
         self.main_window.geometry('500x220')
         self.main_window.title("Admin access")
 
@@ -24,235 +20,228 @@ class AdminGUI():
 
         #VAR TO SET COMBOBOX VALUE
         self.var = tkinter.StringVar()
-        self.profCourseVar = tkinter.StringVar()
-        self.studentCourseVar = tkinter.StringVar()
+        self.prof_course_var = tkinter.StringVar()
+        self.student_course_var = tkinter.StringVar()
 
         #FRAME AND CANVAS
-        self.masterFrame = tkinter.Frame(self.main_window, pady=15)
-        self.canvasStudent = tkinter.Canvas(self.main_window)
-        self.frameStd1 = tkinter.Frame(self.canvasStudent)
-        self.frameStd2 = tkinter.Frame(self.canvasStudent, width="250")
-        self.frameStd3 = tkinter.Frame(self.canvasStudent, width="250")
-        self.frameStd4 = tkinter.Frame(self.canvasStudent)
-        self.frameStd5 = tkinter.Frame(self.canvasStudent)
-        self.frameStd6 = tkinter.Frame(self.canvasStudent)
-        self.frameStd7 = tkinter.Frame(self.canvasStudent)
+        self.master_frame = tkinter.Frame(self.main_window, pady=15)
+        self.canvas_student = tkinter.Canvas(self.main_window)
+        self.frame_std1 = tkinter.Frame(self.canvas_student)
+        self.frame_std2 = tkinter.Frame(self.canvas_student, width="250")
+        self.frame_std3 = tkinter.Frame(self.canvas_student, width="250")
+        self.frame_std4 = tkinter.Frame(self.canvas_student)
+        self.frame_std5 = tkinter.Frame(self.canvas_student)
+        self.frame_std6 = tkinter.Frame(self.canvas_student)
+        self.frame_std7 = tkinter.Frame(self.canvas_student)
 
-        self.topSeparator = tkinter.Frame(self.main_window, height=2, bd=2, relief="sunken")
-        self.bottomSeparator = tkinter.Frame(self.main_window, height=2, bd=2, relief="sunken")
+        self.top_separator = tkinter.Frame(self.main_window, height=2, bd=2, relief="sunken")
+        self.bottom_separator = tkinter.Frame(self.main_window, height=2, bd=2, relief="sunken")
 
-        self.canvasProfessor = tkinter.Canvas(self.main_window)
-        self.frameProf1 = tkinter.Frame(self.canvasProfessor)
-        self.frameProf2 = tkinter.Frame(self.canvasProfessor)
-        self.frameProf3 = tkinter.Frame(self.canvasProfessor)
-        self.frameProf4 = tkinter.Frame(self.canvasProfessor)
-        self.frameProf5 = tkinter.Frame(self.canvasProfessor)
-        self.frameProf6 = tkinter.Frame(self.canvasProfessor)
-        self.frameProf7 = tkinter.Frame(self.canvasProfessor)
+        self.canvas_professor = tkinter.Canvas(self.main_window)
+        self.frame_prof1 = tkinter.Frame(self.canvas_professor)
+        self.frame_prof2 = tkinter.Frame(self.canvas_professor)
+        self.frame_prof3 = tkinter.Frame(self.canvas_professor)
+        self.frame_prof4 = tkinter.Frame(self.canvas_professor)
+        self.frame_prof5 = tkinter.Frame(self.canvas_professor)
+        self.frame_prof6 = tkinter.Frame(self.canvas_professor)
+        self.frame_prof7 = tkinter.Frame(self.canvas_professor)
 
-        self.canvasCourse = tkinter.Canvas(self.main_window)
-        self.frameCourse1 = tkinter.Frame(self.canvasCourse)
-        self.frameCourse2 = tkinter.Frame(self.canvasCourse)
-        self.frameCourse3 = tkinter.Frame(self.canvasCourse)
+        self.canvas_course = tkinter.Canvas(self.main_window)
+        self.frame_course1 = tkinter.Frame(self.canvas_course)
+        self.frame_course2 = tkinter.Frame(self.canvas_course)
+        self.frame_course3 = tkinter.Frame(self.canvas_course)
 
-        self.bottomFrame = tkinter.Frame(self.main_window)
+        self.bottom_frame = tkinter.Frame(self.main_window)
 
 
         # SCREEN ELEMENTS
-        self.typeUserLabel = tkinter.Label(self.masterFrame, text="Select type user:")
-        self.typeEntry = ttk.Combobox(self.masterFrame, textvariable=self.var, values=self.types)
-        self.typeEntry.current(0)
-        self.typeEntry.bind("<<ComboboxSelected>>", self.toogle_canvas)
+        self.type_user_label = tkinter.Label(self.master_frame, text="Select screen to edit:")
+        self.type_entry = ttk.Combobox(self.master_frame, textvariable=self.var, values=self.types)
+        self.type_entry.current(0)
+        self.type_entry.bind("<<ComboboxSelected>>", self.toogle_canvas)
 
         #STUDENT
-        self.studentsTitleLabel = tkinter.Label(self.frameStd1, text="Students data", font=("Helvetica", 16))
-        self.studentNumberLabel = tkinter.Label(self.frameStd2, text="Student's Number:")
-        self.studentNumberEntry = tkinter.Entry(self.frameStd3, width=21)
-        self.btnSearchStudent = tkinter.Button(self.frameStd3, text="Search", command="")
+        self.students_title_label = tkinter.Label(self.frame_std1, text="Students data", font=("Helvetica", 16))
+        self.student_number_label = tkinter.Label(self.frame_std2, text="Student's Number:")
+        self.student_number_entry = tkinter.Entry(self.frame_std3, width=21)
+        self.btn_search_student = tkinter.Button(self.frame_std3, text="Search", command="")
 
-        self.studentNameLabel = tkinter.Label(self.frameStd2, text="Student's Name:", padx=122)
-        self.studentNameEntry = tkinter.Entry(self.frameStd3, width=20)
+        self.student_name_label = tkinter.Label(self.frame_std2, text="Student's Name:", padx=122)
+        self.student_name_entry = tkinter.Entry(self.frame_std3, width=20)
 
-        self.studentCourseNameLabel = tkinter.Label(self.frameStd4, text="Student's Course")
-        self.studentCourseNameEntry = ttk.Combobox(self.frameStd5, textvariable=self.studentCourseVar,
+        self.student_course_name_label = tkinter.Label(self.frame_std4, text="Student's Course")
+        self.student_course_name_entry = ttk.Combobox(self.frame_std5, textvariable=self.student_course_var,
                                                    values="", width=25)
-        #self.studentCourseNameEntry.current(0)
+        #self.student_course_name_entry.current(0)
 
-        self.studentGradeLabel = tkinter.Label(self.frameStd4, text="Grade:", padx=129)
-        self.studentGradeEntry = tkinter.Entry(self.frameStd5, width=20)
+        self.student_grade_label = tkinter.Label(self.frame_std4, text="Grade:", padx=129)
+        self.student_grade_entry = tkinter.Entry(self.frame_std5, width=20)
 
-        self.studentUsernameLabel = tkinter.Label(self.frameStd6, text="Username:")
-        self.studentUsernameEntry = tkinter.Entry(self.frameStd7, width=26)
+        self.student_username_label = tkinter.Label(self.frame_std6, text="Username:")
+        self.student_username_entry = tkinter.Entry(self.frame_std7, width=26)
 
-        self.studentPasswordLabel = tkinter.Label(self.frameStd6, text="Password:", padx=180)
-        self.studentPasswordEntry = tkinter.Entry(self.frameStd7, width=21)
+        self.student_password_label = tkinter.Label(self.frame_std6, text="Password:", padx=180)
+        self.student_password_entry = tkinter.Entry(self.frame_std7, width=21)
 
         #PROFESSOR
-        self.professorTitleLabel = tkinter.Label(self.frameProf1, text="Professor's data", font=("Helvetica", 16))
+        self.professor_title_label = tkinter.Label(self.frame_prof1, text="Professor's data", font=("Helvetica", 16))
 
-        self.professorNumberLabel = tkinter.Label(self.frameProf2, text="Professor's number:")
-        self.professorNumberEntry = tkinter.Entry(self.frameProf3, width=20)
-        self.btnSearchProf = tkinter.Button(self.frameProf3, text="Search", command="")
+        self.professor_number_label = tkinter.Label(self.frame_prof2, text="Professor's number:")
+        self.professor_number_entry = tkinter.Entry(self.frame_prof3, width=20)
+        self.btn_search_prof = tkinter.Button(self.frame_prof3, text="Search", command="")
 
-        self.professorNameLabel = tkinter.Label(self.frameProf2, text="Professor's Name:", padx=110)
-        self.professorNameEntry = tkinter.Entry(self.frameProf3, width=20)
+        self.professor_name_label = tkinter.Label(self.frame_prof2, text="Professor's Name:", padx=110)
+        self.professor_name_entry = tkinter.Entry(self.frame_prof3, width=20)
 
-        self.professorCourseLabel = tkinter.Label(self.frameProf4, text="Course:")
-        self.professorCourseEntry = ttk.Combobox(self.frameProf5, textvariable=self.profCourseVar, values="")
-        #self.professorCourseEntry.current(0)
+        self.professor_course_label = tkinter.Label(self.frame_prof4, text="Course:")
+        self.professor_course_entry = ttk.Combobox(self.frame_prof5, textvariable=self.prof_course_var, values="")
+        #self.professor_course_entry.current(0)
 
-        self.professorUsernameLabel = tkinter.Label(self.frameProf6, text="Professor's username:")
-        self.professorUsernameEntry = tkinter.Entry(self.frameProf7, width=20)
+        self.professor_username_label = tkinter.Label(self.frame_prof6, text="Professor's username:")
+        self.professor_username_entry = tkinter.Entry(self.frame_prof7, width=20)
 
-        self.professorPasswordLabel = tkinter.Label(self.frameProf6, text="Professor's password:", padx=40)
-        self.professorPasswordEntry = tkinter.Entry(self.frameProf7, width=20)
+        self.professor_password_label = tkinter.Label(self.frame_prof6, text="Professor's password:", padx=40)
+        self.professor_password_entry = tkinter.Entry(self.frame_prof7, width=20)
 
         #COURSE
-        self.courseTitleLabel = tkinter.Label(self.frameCourse1, text="Course", font=("Helvetica", 16))
+        self.course_title_label = tkinter.Label(self.frame_course1, text="Course", font=("Helvetica", 16))
 
-        self.courseNumberLabel = tkinter.Label(self.frameCourse2, text="Course Number: ")
-        self.courseNumberEntry = tkinter.Entry(self.frameCourse3, width=20)
-        self.btnSearchCourse = tkinter.Button(self.frameCourse3, text="Search", command="")
+        self.course_number_label = tkinter.Label(self.frame_course2, text="Course Number: ")
+        self.course_number_entry = tkinter.Entry(self.frame_course3, width=20)
+        self.btn_search_course = tkinter.Button(self.frame_course3, text="Search", command="")
 
-        self.courseNameLabel = tkinter.Label(self.frameCourse2, text="Course Number: ", padx=125)
-        self.courseNameEntry = tkinter.Entry(self.frameCourse3, width=20)
+        self.course_name_label = tkinter.Label(self.frame_course2, text="Course Number: ", padx=125)
+        self.course_name_entry = tkinter.Entry(self.frame_course3, width=20)
 
         #buttons
 
-        self.btnSave = tkinter.Button(self.bottomFrame, text="Save/Update", command="", width=10)
-        self.btnDelete = tkinter.Button(self.bottomFrame, text="Delete", command="", width=10)
-        self.btnNew = tkinter.Button(self.bottomFrame, text="New", command="", width=10)
+        self.btn_save = tkinter.Button(self.bottom_frame, text="Save/Update", command="", width=10)
+        self.btn_delete = tkinter.Button(self.bottom_frame, text="Delete", command="", width=10)
+        self.btn_new = tkinter.Button(self.bottom_frame, text="New", command="", width=10)
 
         #PACK
-        self.masterFrame.pack(fill="x")
-        self.topSeparator.pack(fill="x", padx=5, pady=5)
-        self.canvasCourse.pack(fill="x")
-        self.canvasStudent.pack_forget()
-        self.canvasProfessor.pack_forget()
+        self.master_frame.pack(fill="x")
+        self.top_separator.pack(fill="x", padx=5, pady=5)
+        self.canvas_course.pack(fill="x")
+        self.canvas_student.pack_forget()
+        self.canvas_professor.pack_forget()
 
-        self.frameStd1.pack(fill="x")
-        self.frameStd2.pack(fill="both", expand="true")
-        self.frameStd3.pack(fill="both", expand="true")
-        self.frameStd4.pack(fill="both", expand="true")
-        self.frameStd5.pack(fill="both", expand="true")
-        self.frameStd6.pack(fill="both", expand="true")
-        self.frameStd7.pack(fill="both", expand="true")
+        self.frame_std1.pack(fill="x")
+        self.frame_std2.pack(fill="both", expand="true")
+        self.frame_std3.pack(fill="both", expand="true")
+        self.frame_std4.pack(fill="both", expand="true")
+        self.frame_std5.pack(fill="both", expand="true")
+        self.frame_std6.pack(fill="both", expand="true")
+        self.frame_std7.pack(fill="both", expand="true")
 
-        self.frameProf1.pack(fill="x")
-        self.frameProf2.pack(fill="x")
-        self.frameProf3.pack(fill="x")
-        self.frameProf4.pack(fill="x")
-        self.frameProf5.pack(fill="x")
-        self.frameProf6.pack(fill="x")
-        self.frameProf7.pack(fill="x")
+        self.frame_prof1.pack(fill="x")
+        self.frame_prof2.pack(fill="x")
+        self.frame_prof3.pack(fill="x")
+        self.frame_prof4.pack(fill="x")
+        self.frame_prof5.pack(fill="x")
+        self.frame_prof6.pack(fill="x")
+        self.frame_prof7.pack(fill="x")
 
-        self.frameCourse1.pack(fill="x")
-        self.frameCourse2.pack(fill="x")
-        self.frameCourse3.pack(fill="x")
+        self.frame_course1.pack(fill="x")
+        self.frame_course2.pack(fill="x")
+        self.frame_course3.pack(fill="x")
 
-        self.typeUserLabel.pack(side="left")
-        self.typeEntry.pack(side="left")
+        self.type_user_label.pack(side="left")
+        self.type_entry.pack(side="left")
 
-        self.studentsTitleLabel.pack(side="left", pady=5)
-        self.studentNumberLabel.pack(side="left", fill="x")
-        self.studentNumberEntry.pack(side="left", fill="both")
-        self.btnSearchStudent.pack(side="left", fill="both")
+        self.students_title_label.pack(side="left", pady=5)
+        self.student_number_label.pack(side="left", fill="x")
+        self.student_number_entry.pack(side="left", fill="both")
+        self.btn_search_student.pack(side="left", fill="both")
 
-        self.studentNameLabel.pack(side="left", fill="x")
-        self.studentNameEntry.pack(side="left", fill="both")
+        self.student_name_label.pack(side="left", fill="x")
+        self.student_name_entry.pack(side="left", fill="both")
 
-        self.studentCourseNameLabel.pack(side="left", fill="x")
-        self.studentCourseNameEntry.pack(side="left", fill="x")
+        self.student_course_name_label.pack(side="left", fill="x")
+        self.student_course_name_entry.pack(side="left", fill="x")
 
-        self.studentGradeLabel.pack(side="left", fill="x")
-        self.studentGradeEntry.pack(side="left", fill="both")
+        self.student_grade_label.pack(side="left", fill="x")
+        self.student_grade_entry.pack(side="left", fill="both")
 
-        self.studentUsernameLabel.pack(side="left", fill="x")
-        self.studentUsernameEntry.pack(side="left", fill="both")
+        self.student_username_label.pack(side="left", fill="x")
+        self.student_username_entry.pack(side="left", fill="both")
 
-        self.studentPasswordLabel.pack(side="left", fill="x")
-        self.studentPasswordEntry.pack(side="left", fill="both")
+        self.student_password_label.pack(side="left", fill="x")
+        self.student_password_entry.pack(side="left", fill="both")
 
         #professor
-        self.professorTitleLabel.pack(side="left", pady=5)
-        self.professorNumberLabel.pack(side="left", fill="x")
-        self.professorNumberEntry.pack(side="left", fill="both")
-        self.btnSearchProf.pack(side="left", fill="both")
+        self.professor_title_label.pack(side="left", pady=5)
+        self.professor_number_label.pack(side="left", fill="x")
+        self.professor_number_entry.pack(side="left", fill="both")
+        self.btn_search_prof.pack(side="left", fill="both")
 
-        self.professorNameLabel.pack(side="left", fill="x")
-        self.professorNameEntry.pack(side="left", fill="both")
+        self.professor_name_label.pack(side="left", fill="x")
+        self.professor_name_entry.pack(side="left", fill="both")
 
-        self.professorCourseLabel.pack(side="left", fill="x")
-        self.professorCourseEntry.pack(side="left", fill="both")
+        self.professor_course_label.pack(side="left", fill="x")
+        self.professor_course_entry.pack(side="left", fill="both")
 
-        self.professorUsernameLabel.pack(side="left", fill="x")
-        self.professorUsernameEntry.pack(side="left", fill="both")
+        self.professor_username_label.pack(side="left", fill="x")
+        self.professor_username_entry.pack(side="left", fill="both")
 
-        self.professorPasswordLabel.pack(side="left", fill="x")
-        self.professorPasswordEntry.pack(side="left", fill="both")
+        self.professor_password_label.pack(side="left", fill="x")
+        self.professor_password_entry.pack(side="left", fill="both")
 
         #course
-        self.courseTitleLabel.pack(side="left", pady=5)
+        self.course_title_label.pack(side="left", pady=5)
 
-        self.courseNumberLabel.pack(side="left", fill="x")
-        self.courseNumberEntry.pack(side="left", fill="both")
-        self.btnSearchCourse.pack(side="left", fill="both")
+        self.course_number_label.pack(side="left", fill="x")
+        self.course_number_entry.pack(side="left", fill="both")
+        self.btn_search_course.pack(side="left", fill="both")
 
-        self.courseNameLabel.pack(side="left", fill="x")
-        self.courseNameEntry.pack(side="left", fill="both")
+        self.course_name_label.pack(side="left", fill="x")
+        self.course_name_entry.pack(side="left", fill="both")
 
         #bottom
-        self.bottomSeparator.pack(fill="x", padx=5, pady=5)
-        self.bottomFrame.pack(fill="both", padx=50, pady=10)
-        self.btnNew.pack(side="right", fill="both")
-        self.btnDelete.pack(side="right", fill="both", padx=5)
-        self.btnSave.pack(side="right", fill="both")
-
+        self.bottom_separator.pack(fill="x", padx=5, pady=5)
+        self.bottom_frame.pack(fill="both", padx=50, pady=10)
+        self.btn_new.pack(side="right", fill="both")
+        self.btn_delete.pack(side="right", fill="both", padx=5)
+        self.btn_save.pack(side="right", fill="both")
 
         tkinter.mainloop()
 
-
     def toogle_canvas(self, event):
-        if self.var.get() == self.PROFESSOR:
-            self.canvasStudent.pack_forget()
-            self.canvasCourse.pack_forget()
-            self.canvasProfessor.pack(fill="x")
+        if self.var.get() == enum.UserTypes.PROFESSOR.name:
+            self.canvas_student.pack_forget()
+            self.canvas_course.pack_forget()
+            self.canvas_professor.pack(fill="x")
 
-            self.bottomSeparator.pack_forget()
-            self.bottomSeparator.pack(fill="x", padx=5, pady=5)
+            self.bottom_separator.pack_forget()
+            self.bottom_separator.pack(fill="x", padx=5, pady=5)
 
-            self.bottomFrame.pack_forget()
-            self.bottomFrame.pack(fill="both", padx=50, pady=10)
+            self.bottom_frame.pack_forget()
+            self.bottom_frame.pack(fill="both", padx=50, pady=10)
             self.main_window.geometry("500x320")
 
 
-        elif self.var.get()==self.COURSE:
+        elif self.var.get()==enum.UserTypes.COURSE.name:
 
-            self.canvasStudent.pack_forget()
-            self.canvasProfessor.pack_forget()
-            self.canvasCourse.pack(fill="x")
+            self.canvas_student.pack_forget()
+            self.canvas_professor.pack_forget()
+            self.canvas_course.pack(fill="x")
 
-            self.bottomSeparator.pack_forget()
-            self.bottomSeparator.pack(fill="x", padx=5, pady=5)
+            self.bottom_separator.pack_forget()
+            self.bottom_separator.pack(fill="x", padx=5, pady=5)
 
-            self.bottomFrame.pack_forget()
-            self.bottomFrame.pack(fill="both", padx=50, pady=10)
+            self.bottom_frame.pack_forget()
+            self.bottom_frame.pack(fill="both", padx=50, pady=10)
             self.main_window.geometry("500x220")
 
         else:
-            self.canvasStudent.pack(fill="x")
-            self.canvasCourse.pack_forget()
-            self.canvasProfessor.pack_forget()
+            self.canvas_student.pack(fill="x")
+            self.canvas_course.pack_forget()
+            self.canvas_professor.pack_forget()
 
-            self.bottomSeparator.pack_forget()
-            self.bottomSeparator.pack(fill="x", padx=5, pady=5)
+            self.bottom_separator.pack_forget()
+            self.bottom_separator.pack(fill="x", padx=5, pady=5)
 
-            self.bottomFrame.pack_forget()
-            self.bottomFrame.pack(fill="both", padx=50, pady=10)
+            self.bottom_frame.pack_forget()
+            self.bottom_frame.pack(fill="both", padx=50, pady=10)
             self.main_window.geometry("500x320")
 
-
-adm = AdminGUI()
-
-
-        

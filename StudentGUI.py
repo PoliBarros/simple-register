@@ -1,38 +1,39 @@
-# Student
 
 import tkinter
 from tkinter import ttk
 
+
+# Student class
+
 class StudentGUI():
-    def __init__(self):
-        self.main_window = tkinter.Tk()
-        self.main_window.geometry('500x300')
+    def __init__(self, window):
+        self.main_window = window
+        self.main_window.geometry('500x400')
         self.main_window.title("Student access")
 
-        self.frame1 = tkinter.Frame(self.main_window)
-        self.frame2 = tkinter.Frame(self.main_window)
+        self.std_frame1 = tkinter.Frame(self.main_window)
+        self.std_frame2 = tkinter.Frame(self.main_window)
 
-        self.topFrame = tkinter.Frame(self.main_window, height=2, bd=2, relief="sunken")
-        self.frame3 = tkinter.Frame(self.main_window)
-        self.frameTable = tkinter.Frame(self.main_window)
+        self.std_topFrame = tkinter.Frame(self.main_window, height=2, bd=2, relief="sunken")
+        self.std_frame3 = tkinter.Frame(self.main_window)
+        self.std_frameTable = tkinter.Frame(self.main_window)
 
-        #ELEMENTS
-        self.studentLogged = tkinter.Label(self.frame1, text="Student Logged: ")
-        self.studentEntry = tkinter.Entry(self.frame2, width=20)
-        self.studentTitle = tkinter.Label(self.frame3, text="Grades", font=("Helvetica", 16))
+        # ELEMENTS
+        self.student_logged = tkinter.Label(self.std_frame1, text="Student Logged: ")
+        self.student_entry = tkinter.Entry(self.std_frame2, width=20)
+        self.student_title = tkinter.Label(self.std_frame3, text="Grades", font=("Helvetica", 16))
 
-        #PACK
-        self.frame1.pack(fill="x")
-        self.frame2.pack(fill="x")
+        # PACK
+        self.std_frame1.pack(fill="x")
+        self.std_frame2.pack(fill="x")
 
-        self.studentLogged.pack(side="left")
-        self.studentEntry.pack(side="left", fill="both")
+        self.student_logged.pack(side="left")
+        self.student_entry.pack(side="left", fill="both")
 
-        self.topFrame.pack(fill="x", pady=10)
-        self.frame3.pack(fill="x")
-        self.frameTable.pack(fill="x", padx=30)
-        self.studentTitle.pack(side="left", fill="both", padx=25)
-
+        self.std_topFrame.pack(fill="x", pady=10)
+        self.std_frame3.pack(fill="x")
+        self.std_frameTable.pack(fill="x", padx=30)
+        self.student_title.pack(side="left", fill="both", padx=25)
 
         self.LoadTable()
 
@@ -40,7 +41,7 @@ class StudentGUI():
 
     def table(self):
 
-        table = ttk.Treeview(self.frameTable)
+        table = ttk.Treeview(self.std_frameTable)
         table['columns'] = ('course', 'grade')
         table.heading("#0", text='Student', anchor='w')
         table.column("#0", anchor="w")
@@ -56,6 +57,3 @@ class StudentGUI():
     def LoadTable(self):
         self.table().insert('', 'end', text="Name goes here", values=('CSAT', '90'))
 
-
-
-std = StudentGUI()

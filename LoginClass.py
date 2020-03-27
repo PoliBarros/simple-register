@@ -1,5 +1,4 @@
-#Login screen
-import enum
+
 class LoginClass:
     def __init__(self, login, password):
         self.login = login
@@ -18,8 +17,3 @@ class LoginClass:
             self.password = password
 
 
-class UserTypes(enum.Enum):
-    ADM = 0
-    COURSE = 1
-    STUDENTS = 2
-    PROFESSOR = 3
