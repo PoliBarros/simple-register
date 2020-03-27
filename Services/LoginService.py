@@ -1,6 +1,7 @@
 import tkinter
 import Enums as enum
 import DataBaseConnection as db
+import Services.StudentService as stdService
 
 from mysql.connector import Error
 
@@ -13,14 +14,16 @@ def getTypes():
     return tp
 
 
-def login(username, password, login_main):
+def login(username, password, type, login_main):
 
     try:
-        data = (username, password)
+        data = (username, password, type)
 
         conn = db.connect()
         cursor = conn.cursor()
-        cursor.execute("SELECT * FROM User WHERE username = %s AND password = %s", data)
+        cursor.execute("SELECT * FROM User WHERE username = %s " +
+                       "AND password = %s " +
+                       "AND type = %s", data)
         result = cursor.fetchone()
 
         if result is not None:
@@ -35,12 +38,8 @@ def login(username, password, login_main):
                 adm.AdminGUI(win)
 
             elif result[3] == types.STUDENT.name:
-                from GUI import StudentGUI as std
-
-                # close parent before open adm
-                login_main.withdraw()
-                win = tkinter.Toplevel(login_main)
-                std.StudentGUI(win)
+                stdService.get_std_grades_by_user_id(result[0], login_main)
+                return
             else:
                 from GUI import ProfessorGUI as prof
 

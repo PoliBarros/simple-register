@@ -1,11 +1,12 @@
-#Admin screen
 import tkinter
 from tkinter import ttk
 
-import  Enums as enum
-import LoginService as serv
+import Enums as enum
+from Services import LoginService as serv
 
-class AdminGUI():
+
+# Admin screen
+class AdminGUI:
 
     def __init__(self, windows):
 
@@ -14,16 +15,16 @@ class AdminGUI():
         self.main_window.geometry('500x220')
         self.main_window.title("Admin access")
 
-        #GETTING TYPES
+        # GETTING TYPES
         self.types = serv.getTypes()
         self.types.pop(0)
 
-        #VAR TO SET COMBOBOX VALUE
+        # VAR TO SET COMBOBOX VALUE
         self.var = tkinter.StringVar()
         self.prof_course_var = tkinter.StringVar()
         self.student_course_var = tkinter.StringVar()
 
-        #FRAME AND CANVAS
+        # FRAME AND CANVAS
         self.master_frame = tkinter.Frame(self.main_window, pady=15)
         self.canvas_student = tkinter.Canvas(self.main_window)
         self.frame_std1 = tkinter.Frame(self.canvas_student)
@@ -53,14 +54,13 @@ class AdminGUI():
 
         self.bottom_frame = tkinter.Frame(self.main_window)
 
-
         # SCREEN ELEMENTS
         self.type_user_label = tkinter.Label(self.master_frame, text="Select screen to edit:")
         self.type_entry = ttk.Combobox(self.master_frame, textvariable=self.var, values=self.types)
         self.type_entry.current(0)
         self.type_entry.bind("<<ComboboxSelected>>", self.toogle_canvas)
 
-        #STUDENT
+        # STUDENT
         self.students_title_label = tkinter.Label(self.frame_std1, text="Students data", font=("Helvetica", 16))
         self.student_number_label = tkinter.Label(self.frame_std2, text="Student's Number:")
         self.student_number_entry = tkinter.Entry(self.frame_std3, width=21)
@@ -83,7 +83,7 @@ class AdminGUI():
         self.student_password_label = tkinter.Label(self.frame_std6, text="Password:", padx=180)
         self.student_password_entry = tkinter.Entry(self.frame_std7, width=21)
 
-        #PROFESSOR
+        # PROFESSOR
         self.professor_title_label = tkinter.Label(self.frame_prof1, text="Professor's data", font=("Helvetica", 16))
 
         self.professor_number_label = tkinter.Label(self.frame_prof2, text="Professor's number:")
@@ -103,7 +103,7 @@ class AdminGUI():
         self.professor_password_label = tkinter.Label(self.frame_prof6, text="Professor's password:", padx=40)
         self.professor_password_entry = tkinter.Entry(self.frame_prof7, width=20)
 
-        #COURSE
+        # COURSE
         self.course_title_label = tkinter.Label(self.frame_course1, text="Course", font=("Helvetica", 16))
 
         self.course_number_label = tkinter.Label(self.frame_course2, text="Course Number: ")
@@ -113,13 +113,12 @@ class AdminGUI():
         self.course_name_label = tkinter.Label(self.frame_course2, text="Course Number: ", padx=125)
         self.course_name_entry = tkinter.Entry(self.frame_course3, width=20)
 
-        #buttons
-
+        # BUTTONS
         self.btn_save = tkinter.Button(self.bottom_frame, text="Save/Update", command="", width=10)
         self.btn_delete = tkinter.Button(self.bottom_frame, text="Delete", command="", width=10)
         self.btn_new = tkinter.Button(self.bottom_frame, text="New", command="", width=10)
 
-        #PACK
+        # PACK
         self.master_frame.pack(fill="x")
         self.top_separator.pack(fill="x", padx=5, pady=5)
         self.canvas_course.pack(fill="x")
@@ -169,7 +168,7 @@ class AdminGUI():
         self.student_password_label.pack(side="left", fill="x")
         self.student_password_entry.pack(side="left", fill="both")
 
-        #professor
+        # professor
         self.professor_title_label.pack(side="left", pady=5)
         self.professor_number_label.pack(side="left", fill="x")
         self.professor_number_entry.pack(side="left", fill="both")
@@ -187,7 +186,7 @@ class AdminGUI():
         self.professor_password_label.pack(side="left", fill="x")
         self.professor_password_entry.pack(side="left", fill="both")
 
-        #course
+        # course
         self.course_title_label.pack(side="left", pady=5)
 
         self.course_number_label.pack(side="left", fill="x")
@@ -197,7 +196,7 @@ class AdminGUI():
         self.course_name_label.pack(side="left", fill="x")
         self.course_name_entry.pack(side="left", fill="both")
 
-        #bottom
+        # bottom
         self.bottom_separator.pack(fill="x", padx=5, pady=5)
         self.bottom_frame.pack(fill="both", padx=50, pady=10)
         self.btn_new.pack(side="right", fill="both")
