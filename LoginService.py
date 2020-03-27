@@ -1,5 +1,5 @@
 import tkinter
-import LoginClass as log
+import Enums as enum
 import DataBaseConnection as db
 
 from mysql.connector import Error
@@ -7,7 +7,7 @@ from mysql.connector import Error
 
 def getTypes():
     tp = []
-    for types in log.UserTypes:
+    for types in enum.UserTypes:
         tp.append(types.name)
 
     return tp
@@ -24,10 +24,10 @@ def login(username, password, login_main):
         result = cursor.fetchone()
 
         if result is not None:
-            types = log.UserTypes
+            types = enum.UserTypes
 
             if result[3] == "ADM":
-                import AdminGUI as adm
+                from GUI import AdminGUI as adm
 
                 # close parent before open adm
                 login_main.withdraw()
@@ -35,14 +35,14 @@ def login(username, password, login_main):
                 adm.AdminGUI(win)
 
             elif result[3] == types.STUDENT.name:
-                import StudentGUI as std
+                from GUI import StudentGUI as std
 
                 # close parent before open adm
                 login_main.withdraw()
                 win = tkinter.Toplevel(login_main)
                 std.StudentGUI(win)
             else:
-                import ProfessorGUI as prof
+                from GUI import ProfessorGUI as prof
 
                 # close parent before open adm
                 login_main.withdraw()

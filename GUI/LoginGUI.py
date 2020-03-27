@@ -64,10 +64,11 @@ class LoginGUI:
         tkinter.mainloop()
 
     def login(self):
-        ret = logService.login(self.loginEntry.get(), self.pwEntry.get(), self.main_window)
+        ret = logService.login(self.login_entry.get(), self.pw_entry.get(), self.main_window)
         if ret:
             self.error_message_label['text'] = ret
             self.error_message_label.pack()
+
 
 loginGui = LoginGUI()
 
