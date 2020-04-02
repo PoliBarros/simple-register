@@ -20,14 +20,18 @@ class AdminGUI:
         self.types = serv.getTypes()
         self.types.pop(0)
 
-        # GET ALL COURSES
-        self.courses = admServ.find_course(None)
-        self.courses = self.courses.result
+        # INITIALIZE COURSE COMBOBOX
+        self.setAllCourses()
 
-        # VAR TO SET COMBOBOX VALUE
+        # VAR TO SET INPUT VALUE
         self.var = tkinter.StringVar()
         self.prof_course_var = tkinter.StringVar()
         self.student_course_var = tkinter.StringVar()
+        self.var_numbers = tkinter.StringVar()
+
+        # VALIDATIONS
+        self.var_numbers.trace('w', self.only_numbers)
+        self.var_numbers.trace('w', self.maxlenght)
 
         # FRAME AND CANVAS
         self.master_frame = tkinter.Frame(self.main_window, pady=15)
@@ -67,18 +71,19 @@ class AdminGUI:
         self.type_entry.bind("<<ComboboxSelected>>", self.toogle_canvas)
 
         # STUDENT
-        self.students_title_label = tkinter.Label(self.frame_std1, text="Students data", font=("Helvetica", 16))
+        self.students_title_label = tkinter.Label(self.frame_std1, text="Students data", font=("Helvetica", 16), pady=5)
         self.student_number_label = tkinter.Label(self.frame_std2, text="Student's Number:")
-        self.student_number_entry = tkinter.Entry(self.frame_std3, width=21)
-        self.btn_search_student = tkinter.Button(self.frame_std3, text="Search", command="")
+        self.student_number_entry = tkinter.Entry(self.frame_std3, width=21, textvariable=self.var_numbers)
+        self.btn_search_student = tkinter.Button(self.frame_std3, text="Search", command=self.find)
 
         self.student_name_label = tkinter.Label(self.frame_std2, text="Student's Name:", padx=122)
         self.student_name_entry = tkinter.Entry(self.frame_std3, width=20)
 
         self.student_course_name_label = tkinter.Label(self.frame_std4, text="Student's Course")
         self.student_course_name_entry = ttk.Combobox(self.frame_std5, textvariable=self.student_course_var,
-                                                   values="", width=25)
-        #self.student_course_name_entry.current(0)
+                                                      values=self.courses, width=25)
+        if self.courses:
+            self.student_course_name_entry.current(0)
 
         self.student_grade_label = tkinter.Label(self.frame_std4, text="Grade:", padx=129)
         self.student_grade_entry = tkinter.Entry(self.frame_std5, width=20)
@@ -90,11 +95,12 @@ class AdminGUI:
         self.student_password_entry = tkinter.Entry(self.frame_std7, width=21)
 
         # PROFESSOR
-        self.professor_title_label = tkinter.Label(self.frame_prof1, text="Professor's data", font=("Helvetica", 16))
+        self.professor_title_label = tkinter.Label(self.frame_prof1, text="Professor's data", font=("Helvetica", 16),
+                                                   pady=5)
 
         self.professor_number_label = tkinter.Label(self.frame_prof2, text="Professor's number:")
-        self.professor_number_entry = tkinter.Entry(self.frame_prof3, width=20)
-        self.btn_search_prof = tkinter.Button(self.frame_prof3, text="Search", command="")
+        self.professor_number_entry = tkinter.Entry(self.frame_prof3, width=20, textvariable=self.var_numbers)
+        self.btn_search_prof = tkinter.Button(self.frame_prof3, text="Search", command=self.find)
 
         self.professor_name_label = tkinter.Label(self.frame_prof2, text="Professor's Name:", padx=110)
         self.professor_name_entry = tkinter.Entry(self.frame_prof3, width=20)
@@ -102,7 +108,12 @@ class AdminGUI:
         self.professor_course_label = tkinter.Label(self.frame_prof4, text="Course:")
         self.professor_course_entry = ttk.Combobox(self.frame_prof5, state="readonly",
                                                    textvariable=self.prof_course_var, values=self.courses)
-        #self.professor_course_entry.current(0)
+        if self.courses:
+            self.professor_course_entry.current(0)
+
+        self.professor_course_name_entry = tkinter.Entry(self.frame_prof5, width=20)
+        if self.courses:
+            self.professor_course_name_entry.insert(0, self.nameCourse.result[1])
 
         self.professor_username_label = tkinter.Label(self.frame_prof6, text="Professor's username:")
         self.professor_username_entry = tkinter.Entry(self.frame_prof7, width=20)
@@ -110,11 +121,14 @@ class AdminGUI:
         self.professor_password_label = tkinter.Label(self.frame_prof6, text="Professor's password:", padx=40)
         self.professor_password_entry = tkinter.Entry(self.frame_prof7, width=20)
 
-        # COURSE
-        self.course_title_label = tkinter.Label(self.frame_course1, text="Course", font=("Helvetica", 16))
+        # Bind
+        self.professor_course_entry.bind("<<ComboboxSelected>>", self.select_course)
 
-        self.course_number_label = tkinter.Label(self.frame_course2, text="Course Number: ")
-        self.course_number_entry = tkinter.Entry(self.frame_course3, width=20)
+        # COURSE
+        self.course_title_label = tkinter.Label(self.frame_course1, text="Course", font=("Helvetica", 16), pady=5)
+
+        self.course_code_label = tkinter.Label(self.frame_course2, text="Course Code: ")
+        self.course_code_entry = tkinter.Entry(self.frame_course3, width=20)
         self.btn_search_course = tkinter.Button(self.frame_course3, text="Search", command=self.find)
 
         self.course_name_label = tkinter.Label(self.frame_course2, text="Course Name: ", padx=125)
@@ -130,7 +144,7 @@ class AdminGUI:
 
         # PACK
         self.master_frame.pack(fill="x")
-        self.top_separator.pack(fill="x", padx=5, pady=5)
+        self.top_separator.pack(fill="x", padx=5)
         self.canvas_course.pack(fill="x")
         self.canvas_student.pack_forget()
         self.canvas_professor.pack_forget()
@@ -158,7 +172,7 @@ class AdminGUI:
         self.type_user_label.pack(side="left")
         self.type_entry.pack(side="left")
 
-        self.students_title_label.pack(side="left", pady=5)
+        self.students_title_label.pack(side="left")
         self.student_number_label.pack(side="left", fill="x")
         self.student_number_entry.pack(side="left", fill="both")
         self.btn_search_student.pack(side="left", fill="both")
@@ -179,7 +193,7 @@ class AdminGUI:
         self.student_password_entry.pack(side="left", fill="both")
 
         # professor
-        self.professor_title_label.pack(side="left", pady=5)
+        self.professor_title_label.pack(side="left")
         self.professor_number_label.pack(side="left", fill="x")
         self.professor_number_entry.pack(side="left", fill="both")
         self.btn_search_prof.pack(side="left", fill="both")
@@ -190,6 +204,8 @@ class AdminGUI:
         self.professor_course_label.pack(side="left", fill="x")
         self.professor_course_entry.pack(side="left", fill="both")
 
+        self.professor_course_name_entry.pack(side="left", fill="both")
+
         self.professor_username_label.pack(side="left", fill="x")
         self.professor_username_entry.pack(side="left", fill="both")
 
@@ -197,10 +213,10 @@ class AdminGUI:
         self.professor_password_entry.pack(side="left", fill="both")
 
         # course
-        self.course_title_label.pack(side="left", pady=5)
+        self.course_title_label.pack(side="left")
 
-        self.course_number_label.pack(side="left", fill="x")
-        self.course_number_entry.pack(side="left", fill="both")
+        self.course_code_label.pack(side="left", fill="x")
+        self.course_code_entry.pack(side="left", fill="both")
         self.btn_search_course.pack(side="left", fill="both")
 
         self.course_name_label.pack(side="left", fill="x")
@@ -213,12 +229,47 @@ class AdminGUI:
         self.btn_delete.pack(side="right", fill="both", padx=5)
         self.btn_save.pack(side="right", fill="both")
 
-        self.messageFrame.pack()
+        self.messageFrame.pack(fill="x")
         self.message.pack(fill="both")
 
         tkinter.mainloop()
 
+    def setAllCourses(self):
+        self.courses = admServ.find_course(None)
+        self.courses = self.courses.result
+        if self.courses:
+            # find the first name of the course for prof
+            self.nameCourse = admServ.find_course(self.courses[0])
+        else:
+            self.nameCourse = ""
+
+    def maxlenght(self, *args):
+        if self.var.get() == enum.UserTypes.STUDENT.name:
+            value = self.var_numbers.get()
+            if len(value) > 6:
+                self.var_numbers.set(value[:6])
+        else:
+            value = self.var_numbers.get()
+            if len(value) > 4:
+                self.var_numbers.set(value[:4])
+
+    def only_numbers(self, *char):
+        if not self.var_numbers.get().isdigit():
+            corrected = ''.join(filter(str.isdigit, self.var_numbers.get()))
+            self.var_numbers.set(corrected)
+
+    def select_course(self, event):
+        course = admServ.find_course(self.prof_course_var.get())
+        if course.result is not None:
+            self.professor_course_name_entry.delete(0, 'end')
+            self.professor_course_name_entry.insert(0, course.result[1])
+
     def toogle_canvas(self, event):
+        self.new()
+        self.setAllCourses()
+        # update combobox couse of sceens
+        self.student_course_name_entry.config(values=self.courses)
+        self.professor_course_entry.config(values=self.courses)
         if self.var.get() == enum.UserTypes.PROFESSOR.name:
             self.canvas_student.pack_forget()
             self.canvas_course.pack_forget()
@@ -228,12 +279,13 @@ class AdminGUI:
             self.bottom_separator.pack(fill="x", padx=5, pady=5)
 
             self.bottom_frame.pack_forget()
-            self.bottom_frame.pack(fill="both", padx=50, pady=10)
-            self.main_window.geometry("500x320")
+            self.bottom_frame.pack(fill="both", padx=50)
+            self.messageFrame.pack_forget()
+            self.messageFrame.pack(fill="x")
 
+            self.main_window.geometry("500x330")
 
-        elif self.var.get()==enum.UserTypes.COURSE.name:
-
+        elif self.var.get() == enum.UserTypes.COURSE.name:
             self.canvas_student.pack_forget()
             self.canvas_professor.pack_forget()
             self.canvas_course.pack(fill="x")
@@ -242,8 +294,11 @@ class AdminGUI:
             self.bottom_separator.pack(fill="x", padx=5, pady=5)
 
             self.bottom_frame.pack_forget()
-            self.bottom_frame.pack(fill="both", padx=50, pady=10)
-            self.main_window.geometry("500x220")
+            self.bottom_frame.pack(fill="both", padx=50)
+            self.messageFrame.pack_forget()
+            self.messageFrame.pack(fill="x")
+
+            self.main_window.geometry("500x230")
 
         else:
             self.canvas_student.pack(fill="x")
@@ -255,12 +310,22 @@ class AdminGUI:
 
             self.bottom_frame.pack_forget()
             self.bottom_frame.pack(fill="both", padx=50, pady=10)
+            self.messageFrame.pack_forget()
+            self.messageFrame.pack(fill="x")
+
             self.main_window.geometry("500x320")
 
     def save(self):
+        self.message['text'] = ""
+        number = self.course_code_entry.get()
+        course = self.course_name_entry.get()
+
         if self.var.get() == enum.UserTypes.COURSE.name:
-            course = admServ.save_course(self.course_number_entry.get(), self.course_name_entry.get())
-            self.message['text'] = course
+            if number:
+                course = admServ.save_course(number, course)
+                self.message['text'] = course
+            else:
+                self.message['text'] = "Please enter all fields to save."
 
         elif self.var.get() == enum.UserTypes.PROFESSOR.name:
             number = self.professor_number_entry.get()
@@ -268,20 +333,37 @@ class AdminGUI:
             course = self.professor_course_entry.get()
             username = self.professor_username_entry.get()
             password = self.professor_password_entry.get()
+            type = self.var.get()
 
-            prof = admServ.save_professor(number, name, course, username, password)
-            self.message['text'] = prof
+            if number and name and course and username and password:
+                prof = admServ.save_professor(number, name, course, username, password, type)
+                if prof.msg:
+                    self.message['text'] = prof
+            else:
+                self.message['text'] = "Please enter all fields to save."
 
         else:
-            std = admServ.save_course(self.course_number_entry.get(), self.course_name_entry.get())
-            self.message['text'] = std
+            stdNumber = self.student_number_entry.get()
+            stdName = self.student_name_entry.get()
+            stdCourse = self.student_course_var.get()
+            stdGrade = self.student_grade_entry.get()
+            stdUser = self.student_number_entry.get()
+            stdUsername = self.student_username_entry.get()
+            stdPassword = self.student_password_entry.get()
+            type = self.var.get()
+            if stdNumber and stdName and stdCourse:
+                std = admServ.save_student(stdNumber, stdName, stdCourse, stdGrade,
+                                           stdUser, stdUsername, stdPassword, type)
+                self.message['text'] = std
+            else:
+                self.message['text'] = "Please enter all fields to save."
 
     def find(self):
-        # clean entry before search
-        if self.var.get() == enum.UserTypes.COURSE.name:
+        #clen fields
 
+        if self.var.get() == enum.UserTypes.COURSE.name:
             self.course_name_entry.insert(0, "")
-            course = admServ.find_course(self.course_number_entry.get())
+            course = admServ.find_course(self.course_code_entry.get())
             if course.result is not "":
                 self.course_name_entry.insert(0, course.result[1])
             if course.msg is not None:
@@ -289,34 +371,94 @@ class AdminGUI:
 
         elif self.var.get() == enum.UserTypes.PROFESSOR.name:
 
-            self.professor_course_entry.insert(0, "")
             prof = admServ.find_professor(self.professor_number_entry.get())
+            course = admServ.find_course(prof.result[2])
+            user = admServ.find_user(self.professor_number_entry.get())
+
+            # clear all fields
+            self.new()
             if prof.result is not "":
-                self.course_name_entry.insert(0, prof.result[1])
+                self.professor_number_entry.insert(0, prof.result[0])
+                self.professor_name_entry.insert(0, prof.result[1])
+                self.prof_course_var.set(prof.result[2])
+                self.professor_course_name_entry.insert(0, course.result[1])
+                self.professor_username_entry.insert(0, user.result[1])
+                self.professor_password_entry.insert(0, user.result[2])
+
             if prof.msg is not None:
                 self.message['text'] = prof.msg
 
         else:
-            self.student_name_entry.insert(0, "")
+            self.student_name_entry.delete(0, 'end')
             std = admServ.find_student(self.student_number_entry.get())
-            if std.result is not "":
-                self.course_name_entry.insert(0, std.result[1])
+            user = admServ.find_user(self.student_number_entry.get())
+
+            # clear all fields
+            self.new()
+            if std.result is not '':
+                self.student_number_entry.insert(0, std.result[0])
+                self.student_name_entry.insert(0, std.result[1])
+                if std.result[3]:
+                    self.student_grade_entry.insert(0, std.result[3] )
+                self.student_course_var.set(std.result[2])
+                self.student_password_entry.insert(0, user.result[1])
+                self.student_username_entry.insert(0, user.result[2])
+
             if std.msg is not None:
                 self.message['text'] = std.msg
 
-
     def delete(self):
-        if self.var.get() == enum.UserTypes.COURSE:
-            course = admServ.delete_course(self.course_number_entry.get())
-            if course.msg is not None:
-                self.message['text'] = course.msg
+        self.message['text'] = ""
+        if self.var.get() == enum.UserTypes.COURSE.name:
+            number = self.course_code_entry.get()
+            if number != '':
+                course = admServ.delete_course(number)
+                if course.msg:
+                    self.message['text'] = course.msg
+            else:
+                self.message['text'] = "Please insert course number to delete."
 
-        elif self.var.get() == enum.UserTypes.PROFESSOR:
-            pass
+        elif self.var.get() == enum.UserTypes.PROFESSOR.name:
+            prof_number = self.professor_number_entry.get()
+            prof_course = self.prof_course_var.get()
+
+            if prof_number != '' and prof_course != '':
+                prof = admServ.delete_professor(prof_number, prof_course)
+                if prof.msg:
+                    self.message['text'] = prof.msg
+            else:
+                self.message['text'] = "Please insert professor number and course to delete."
 
         else:
-            pass
-
+            stdNumber = self.student_number_entry.get()
+            if stdNumber != '' and self.var.get() == enum.UserTypes.STUDENT.name:
+                student = admServ.delete_student(stdNumber)
+                if student.msg:
+                    self.message['text'] = student.msg
+            else:
+                self.message['text'] = "Please insert course number to delete."
 
     def new(self):
-        pass
+        self.message['text'] = ""
+
+        if self.var.get() == enum.UserTypes.COURSE.name:
+            self.course_code_entry.delete(0, 'end')
+            self.course_name_entry.delete(0, 'end')
+
+        elif self.var.get() == enum.UserTypes.PROFESSOR.name:
+            self.professor_number_entry.delete(0, 'end')
+            self.professor_name_entry.delete(0, 'end')
+            if self.courses:
+                self.professor_course_entry.current(0)
+            self.professor_course_name_entry.delete(0, 'end')
+            self.professor_username_entry.delete(0, 'end')
+            self.professor_password_entry.delete(0, 'end')
+
+        else:
+            self.student_number_entry.delete(0, 'end')
+            self.student_name_entry.delete(0, 'end')
+            self.student_grade_entry.delete(0, 'end')
+            if self.courses:
+                self.student_course_name_entry.current(0)
+            self.student_password_entry.delete(0, 'end')
+            self.student_username_entry.delete(0, 'end')

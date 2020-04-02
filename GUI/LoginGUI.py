@@ -48,7 +48,7 @@ class LoginGUI:
         self.pw_entry = tkinter.Entry(self.frame3, show="*", width=10)
 
         # button
-        self.btn_login = tkinter.Button(self.frame5, text="Login", command=self.login)
+        self.btn_login = tkinter.Button(self.frame5, text="Login")
         self.btn_login.pack()
 
         #error message
@@ -79,17 +79,24 @@ class LoginGUI:
         # Bind
         self.login_entry.bind("<FocusIn>", self.handle_focus)
         self.pw_entry.bind("<FocusIn>", self.handle_focus)
+        self.main_window.bind('<Return>', self.login)
+        self.btn_login.bind('<Button-1>', self.login)
 
         tkinter.mainloop()
 
-    def login(self):
-        ret = logService.login(self.login_entry.get(), self.pw_entry.get(), self.var_type.get(), self.main_window)
-        if ret:
-            self.error_message_label['text'] = ret
-            self.error_message_label.pack()
+    def login(self, event):
 
-            self.login_entry['text'] = ""
-            self.pw_entry['text'] = ""
+        if self.login_entry.get() is not "" and self.pw_entry.get() is not "":
+            ret = logService.login(self.login_entry.get(), self.pw_entry.get(), self.var_type.get(), self.main_window)
+            if ret:
+                self.error_message_label['text'] = ret
+                self.error_message_label.pack()
+
+                self.login_entry['text'] = ""
+                self.pw_entry['text'] = ""
+        else:
+            self.error_message_label['text'] = "Please enter username and password"
+            self.error_message_label.pack()
 
     def handle_focus(self, event):
         if event.widget == self.pw_entry or event.widget == self.login_entry:

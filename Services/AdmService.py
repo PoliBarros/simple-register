@@ -1,7 +1,6 @@
 import tkinter
 import Enums as enum
 import DataBaseConnection as db
-import Services.StudentService as stdService
 
 from mysql.connector import Error
 
@@ -10,21 +9,82 @@ class AdmReturn:
     result = "",
     msg = ""
 
-def save_course(code, name):
+
+def insert_update_user(id, username, password, type, update):
     try:
-        data = (code, name)
+        user = (id, username, password, type)
+        user2 = (username, password, type, id)
 
         conn = db.connect()
         cursor = conn.cursor()
-        cursor.execute("SELECT grade FROM STUDENT WHERE courseCodeStd= %s", (code, ))
+
+        if not update:
+            cursor.execute("INSERT INTO User (userId, username,"
+                           + " password, type) VALUES(%s,%s,%s,%s)", user)
+            conn.commit()
+        else:
+            cursor.execute("UPDATE User SET username = %s,"
+                           + " password = %s, type = %s WHERE userId = %s) VALUES(%s,%s,%s,%s)", user2)
+            conn.commit()
+
+    except Error as e:
+        ret = AdmReturn()
+        print("Error while connecting to MySQL", e)
+        ret.result = None
+        ret.msg = "An error occurred while searching user"
+        return ret
+
+    finally:
+        if conn.is_connected():
+            cursor.close()
+            conn.close()
+            print("Connection is closed")
+
+
+def find_user(userId):
+    try:
+
+        conn = db.connect()
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM User WHERE userId = %s ", (userId,))
+        result = cursor.fetchone()
+
+        ret = AdmReturn()
+        ret.result = result
+        ret.msg = ""
+
+        return ret
+
+    except Error as e:
+        ret = AdmReturn()
+        print("Error while connecting to MySQL", e)
+        ret.result = None
+        ret.msg = "An error occurred while searching user"
+        return ret
+
+    finally:
+        if conn.is_connected():
+            cursor.close()
+            conn.close()
+            print("Connection is closed")
+
+
+def save_course(code, name):
+    try:
+        data = (code, name)
+        data2 = (code, name, code)
+
+        conn = db.connect()
+        cursor = conn.cursor()
+        cursor.execute("SELECT grade FROM STUDENT WHERE courseCodeStd= %s", (code,))
         student = cursor.fetchone()
 
-        cursor.execute("SELECT * FROM COURSE WHERE courseCode= %s", (code, ))
+        cursor.execute("SELECT * FROM COURSE WHERE courseCode= %s", (code,))
         course = cursor.fetchone()
 
         if course is not None:
             if student is None:
-                cursor.execute("UPDATE Course SET courseCode = %s, courseName = %s", data)
+                cursor.execute("UPDATE Course SET courseCode = %s, courseName = %s WHERE courseCode = %s", data2)
                 conn.commit()
                 return "Course updated"
 
@@ -48,12 +108,11 @@ def save_course(code, name):
 
 
 def find_course(code):
-
     try:
         conn = db.connect()
         cursor = conn.cursor()
         if code is not None:
-            cursor.execute("SELECT * FROM COURSE WHERE courseCode= %s", (code, ))
+            cursor.execute("SELECT * FROM COURSE WHERE courseCode= %s", (code,))
             course = cursor.fetchone()
 
             ret = AdmReturn()
@@ -86,7 +145,10 @@ def find_course(code):
 
     except Error as e:
         print("Error while connecting to MySQL", e)
-        return "An error occurred while searching"
+        ret = AdmReturn()
+        ret.result = ""
+        ret.msg = "Course not found"
+        return ret
 
     finally:
         if conn.is_connected():
@@ -97,16 +159,15 @@ def find_course(code):
 
 def delete_course(code):
     try:
-
         conn = db.connect()
         cursor = conn.cursor()
-        cursor.execute("SELECT grade FROM Student WHERE courseCodeStd= %s", (code, ))
+        cursor.execute("SELECT grade FROM Student WHERE courseCodeStd= %s", (code,))
         student = cursor.fetchone()
 
         ret = AdmReturn()
 
         if student is None:
-            cursor.execute("DELETE FROM Course WHERE courseCode = %s", (code, ))
+            cursor.execute("DELETE FROM Course WHERE courseCode = %s", (code,))
             conn.commit()
             ret.result = ""
             ret.msg = "Course successfully deleted!"
@@ -114,9 +175,14 @@ def delete_course(code):
             ret.result = ""
             ret.msg = "This course can't be deleted! Students have been graded."
 
+        return ret
+
     except Error as e:
         print("Error while connecting to MySQL", e)
-        return "An error occurred while deleting"
+        ret = AdmReturn()
+        ret.result = ""
+        ret.msg = "An error occurred while deleting"
+        return ret
 
     finally:
         if conn.is_connected():
@@ -124,18 +190,26 @@ def delete_course(code):
             conn.close()
             print("Connection is closed")
 
+
 # ****************** Student **************
 
-def save_student(idStudents, studentName, courseCodeStd, grade, userIdStd):
+def save_student(idStudents, studentName, courseCodeStd, grade, userIdStd, username, password, type):
     try:
+        if not grade:
+            grade = None
+
         data = (idStudents, studentName, courseCodeStd, grade, userIdStd)
+        data2 = (idStudents, studentName, courseCodeStd, grade, userIdStd, idStudents)
 
         conn = db.connect()
         cursor = conn.cursor()
-        cursor.execute("SELECT * FROM STUDENT WHERE idStudents= %s", (idStudents, ))
+        cursor.execute("SELECT * FROM STUDENT WHERE idStudents= %s", (idStudents,))
         student = cursor.fetchone()
 
         if student is None:
+            # create user
+            insert_update_user(idStudents, username, password, type, False)
+            # create student
             cursor.execute("INSERT INTO Student (idStudents, studentName, courseCodeStd,"
                            + " grade, userIdStd) VALUES(%s,%s,%s,%s,%s)", data)
             conn.commit()
@@ -143,8 +217,12 @@ def save_student(idStudents, studentName, courseCodeStd, grade, userIdStd):
 
         else:
             if student[3] is None or student[3] == "":
+                # update user
+                insert_update_user(idStudents, username, password, type, True)
+                # update student
                 cursor.execute("UPDATE Student SET idStudents = %s , studentName = %s, "
-                               + "courseCodeStd = %s, grade = %s, userIdStd = %s", data)
+                               + "courseCodeStd = %s, grade = %s, userIdStd = %s "
+                               + "WHERE idStudents = %s", data2)
                 conn.commit()
                 return "Student updated."
             else:
@@ -160,12 +238,12 @@ def save_student(idStudents, studentName, courseCodeStd, grade, userIdStd):
             conn.close()
             print("Connection is closed")
 
-def find_student(idStd):
 
+def find_student(idStd):
     try:
         conn = db.connect()
         cursor = conn.cursor()
-        cursor.execute("SELECT * FROM Student WHERE idStudents= %s", (idStd, ))
+        cursor.execute("SELECT * FROM Student WHERE idStudents= %s", (idStd,))
         std = cursor.fetchone()
 
         ret = AdmReturn()
@@ -194,19 +272,21 @@ def delete_student(code):
 
         conn = db.connect()
         cursor = conn.cursor()
-        cursor.execute("SELECT grade FROM Student WHERE idStudents= %s", (code, ))
+        cursor.execute("SELECT grade FROM Student WHERE idStudents= %s", (code,))
         student = cursor.fetchone()
 
         ret = AdmReturn()
 
         if student is None:
-            cursor.execute("DELETE FROM Student WHERE idStudents = %s", (code, ))
+            cursor.execute("DELETE FROM Student WHERE idStudents = %s", (code,))
             conn.commit()
             ret.result = ""
             ret.msg = "Student successfully deleted!"
         else:
             ret.result = ""
             ret.msg = "Can't be deleted! This student was already graded."
+
+        return ret
 
     except Error as e:
         print("Error while connecting to MySQL", e)
@@ -218,51 +298,62 @@ def delete_student(code):
             conn.close()
             print("Connection is closed")
 
+
 # ****************** Professor **************
 
-def save_professor(idProf, nameProf, courseCodeProf, usename, password):
+def save_professor(idProf, nameProf, courseCodeProf, usename, password, type):
     try:
 
-        data_user = (idProf, usename, password, enum.UserTypes.PROFESSOR.name)
         data_prof = (idProf, nameProf, courseCodeProf, idProf)
+        data_prof2 = (nameProf, courseCodeProf, idProf)
 
         conn = db.connect()
         cursor = conn.cursor()
-        cursor.execute("SELECT * FROM Professor WHERE idProf= %s", (idProf, ))
+        # verify professor
+        cursor.execute("SELECT * FROM Professor WHERE idProf= %s", (idProf,))
         professor = cursor.fetchone()
+        ret = AdmReturn()
 
         if professor is None:
-            cursor.execute("INSERT INTO User (userId, username, password, type) VALUES(%s,%s,%s,%s)", data_user)
-            conn.commit()
-
+            # create user
+            insert_update_user(idProf, usename, password, type, False)
+            # create professor
             cursor.execute("INSERT INTO Professor (idProf, nameProf, courseCodeProf,"
                            + " userIdProf) VALUES(%s,%s,%s,%s)", data_prof)
             conn.commit()
-            return "Professor saved"
+
+            ret.result = ""
+            ret.msg = "Professor saved"
+            return ret
 
         else:
+            # verify if has graded student with that course linked to the teacher
             cursor.execute("SELECT grade FROM Student WHERE courseCodeStd= %s", (courseCodeProf,))
             student = cursor.fetchone()
-            ret = AdmReturn()
 
             if student is not None:
-
-                cursor.execute("SELECT * FROM Professor WHERE courseCodeProf= %s"
-                               + " and idProf = %s", (courseCodeProf, idProf))
-                prof = cursor.fetchone()
-
-                if prof is None:
-                    cursor.execute("UPDATE Professor SET idProf = %s , nameProf = %s, "
-                               + "courseCodeProf = %s, userIdProf = %s", data_prof)
+                # Verify if the course is given by the professor
+                if professor[2] != courseCodeProf:
+                    # create user
+                    insert_update_user(idProf, usename, password, type, False)
+                    # update professor
+                    cursor.execute("UPDATE Professor SET nameProf = %s, "
+                                   + "courseCodeProf = %s"
+                                   + "WHERE idProf = %s", data_prof2)
                     conn.commit()
-                    return "Professor updated"
+                    ret.result = ""
+                    ret.msg = "Professor updated"
+                    return ret
                 else:
                     return "Can be updated. This professor is linked with a student grade."
             else:
-                cursor.execute("UPDATE Professor SET idProf = %s , nameProf = %s, "
-                               + "courseCodeProf = %s, userIdProf = %s", data_prof)
+                cursor.execute("UPDATE Professor SET nameProf = %s, "
+                               + "courseCodeProf = %s"
+                               + "WHERE idProf = %s", data_prof2)
                 conn.commit()
-                return "Professor updated"
+                ret.result = ""
+                ret.msg = "Professor updated"
+                return ret
 
     except Error as e:
         conn.rollback()
@@ -275,12 +366,12 @@ def save_professor(idProf, nameProf, courseCodeProf, usename, password):
             conn.close()
             print("Connection is closed")
 
-def find_professor(idProf):
 
+def find_professor(idProf):
     try:
         conn = db.connect()
         cursor = conn.cursor()
-        cursor.execute("SELECT * FROM Professor WHERE idProf= %s", (idProf, ))
+        cursor.execute("SELECT * FROM Professor WHERE idProf= %s", (idProf,))
         prof = cursor.fetchone()
 
         ret = AdmReturn()
@@ -309,7 +400,7 @@ def delete_professor(idProf, codeCourse):
 
         conn = db.connect()
         cursor = conn.cursor()
-        cursor.execute("SELECT grade FROM Student WHERE courseCodeStd= %s", (codeCourse, ))
+        cursor.execute("SELECT grade FROM Student WHERE courseCodeStd= %s", (codeCourse,))
         student = cursor.fetchone()
         ret = AdmReturn()
 
@@ -323,6 +414,7 @@ def delete_professor(idProf, codeCourse):
                 conn.commit()
                 ret.result = ""
                 ret.msg = "Professor successfully deleted!"
+
             else:
                 ret.result = ""
                 ret.msg = "Can't be deleted! This professor is linked to a grade student."
@@ -331,6 +423,8 @@ def delete_professor(idProf, codeCourse):
             conn.commit()
             ret.result = ""
             ret.msg = "Professor successfully deleted!"
+
+        return ret
 
     except Error as e:
         print("Error while connecting to MySQL", e)
