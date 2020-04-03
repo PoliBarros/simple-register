@@ -67,7 +67,7 @@ class StudentGUI:
 
     def load_table(self, student):
         if student is not None:
-            self.student_entry.insert(0, student[1][1])
+            self.student_entry.insert(0, student[0][1])
             table = self.table()
             for s in student:
                 self.student_entry.config(state="readonly")

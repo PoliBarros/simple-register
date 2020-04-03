@@ -46,7 +46,7 @@ def login(username, password, type, login_main):
                 # close parent before open adm
                 login_main.withdraw()
                 win = tkinter.Toplevel(login_main)
-                prof.ProfessorGUI(win)
+                prof.ProfessorGUI(win, result[0])
 
         else:
             return "No user found"
