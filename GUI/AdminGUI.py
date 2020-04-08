@@ -34,10 +34,12 @@ class AdminGUI:
         self.student_course_var = tkinter.StringVar()
         self.var_numbers = tkinter.StringVar()
         self.student_professor_number = None
+        self.var_course_code = tkinter.StringVar()
 
         # VALIDATIONS
         self.var_numbers.trace('w', self.only_numbers)
         self.var_numbers.trace('w', self.maxlenght)
+        self.var_course_code.trace('w', self.maxlenght)
 
         # FRAME AND CANVAS
         self.master_frame = tkinter.Frame(self.main_window, pady=15)
@@ -142,7 +144,7 @@ class AdminGUI:
         self.course_title_label = tkinter.Label(self.frame_course1, text="Course", font=("Helvetica", 16), pady=5)
 
         self.course_code_label = tkinter.Label(self.frame_course2, text="Course Code: ")
-        self.course_code_entry = tkinter.Entry(self.frame_course3, width=20)
+        self.course_code_entry = tkinter.Entry(self.frame_course3, textvariable=self.var_course_code, width=20)
         self.btn_search_course = tkinter.Button(self.frame_course3, text="Search", command=self.find)
 
         self.course_name_label = tkinter.Label(self.frame_course2, text="Course Name: ", padx=150)
@@ -289,6 +291,10 @@ class AdminGUI:
             value = self.var_numbers.get()
             if len(value) > 6:
                 self.var_numbers.set(value[:6])
+        elif self.var.get() == enum.UserTypes.COURSE.name:
+            value = self.var_course_code.get()
+            if len(value) > 5:
+                self.var_course_code.set(value[:5])
         else:
             value = self.var_numbers.get()
             if len(value) > 4:

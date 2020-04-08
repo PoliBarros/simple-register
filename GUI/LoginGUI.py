@@ -37,7 +37,7 @@ class LoginGUI:
         # Type selection
         self.type_label = tkinter.Label(self.frame1, text="Select the type: ")
         self.type_entry = ttk.Combobox(self.frame1, textvariable=self.var_type, values=self.return_types)
-        self.type_entry.current(0)
+        self.type_entry.current(2)
 
         # Login data
         self.login_label = tkinter.Label(self.frame2, text='Login:')

@@ -40,8 +40,7 @@ def find_student(idStd, profId):
         cursor.execute("SELECT * FROM Student WHERE idStudents= %s and profIdStd = %s", (idStd, profId))
         std = cursor.fetchall()
 
-        if std is not None:
-            #if std.count() > 1:
+        if std.__len__()> 0:
             courseList = []
             for c in std:
                 courseList.append(c[2])
@@ -72,4 +71,63 @@ def find_student(idStd, profId):
             cursor.close()
             conn.close()
             print("Connection is closed")
+
+
+def find_course(code):
+    ret = ProfReturn()
+    try:
+        conn = db.connect()
+        cursor = conn.cursor()
+        if code is not None:
+            cursor.execute("SELECT courseName FROM Course WHERE courseCode= %s", (code,))
+            course = cursor.fetchone()
+
+            cursor.execute("SELECT grade FROM Student WHERE courseCodeStd= %s", (code,))
+            std = cursor.fetchone()
+            if course is not None:
+                ret.std = std
+                ret.course = course
+                return ret
+            else:
+                ret.msg = "Course not found"
+                return ret
+
+    except Error as e:
+        print("Error while connecting to MySQL", e)
+        ret.msg = "Course not found"
+        return ret
+
+    finally:
+        if conn.is_connected():
+            cursor.close()
+            conn.close()
+            print("Connection is closed")
+
+
+def save(stdId, grade, course):
+    ret = ProfReturn()
+    data = (grade, stdId, course)
+
+    try:
+        conn = db.connect()
+        cursor = conn.cursor()
+        if stdId and grade and course:
+            cursor.execute("UPDATE Student SET grade = %s WHERE profIdStd = %s AND courseCodeStd = %s", data)
+            conn.commit()
+
+            ret.msg = "Grade updated"
+            return ret
+
+    except Error as e:
+        print("Error while connecting to MySQL", e)
+        ret.msg = "Error while updating"
+        return ret
+
+    finally:
+        if conn.is_connected():
+            cursor.close()
+            conn.close()
+            print("Connection is closed")
+
+
 
