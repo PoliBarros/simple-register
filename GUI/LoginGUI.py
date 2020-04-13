@@ -1,5 +1,6 @@
 import tkinter
 from Services import LoginService as logService
+import DataBaseConnection as db;
 
 from tkinter import ttk
 
@@ -32,7 +33,8 @@ class LoginGUI:
         type_var.set(self.return_types[0])
 
         # elements
-        self.title_login_Label = tkinter.Label(self.frame0, text="Select a type and enter a valid username and password.")
+        self.title_login_Label = tkinter.Label(self.frame0,
+                                               text="Select a type and enter a valid username and password.")
 
         # Type selection
         self.type_label = tkinter.Label(self.frame1, text="Select the type: ")
@@ -51,7 +53,7 @@ class LoginGUI:
         self.btn_login = tkinter.Button(self.frame5, text="Login")
         self.btn_login.pack()
 
-        #error message
+        # error message
         self.error_message_label = tkinter.Label(self.frame6, fg="red", text="")
         self.error_message_label.pack_forget()
 
@@ -104,8 +106,6 @@ class LoginGUI:
             self.error_message_label.pack_forget()
 
 
+# create schema
+db.connect()
 loginGui = LoginGUI()
-
-
-
-
