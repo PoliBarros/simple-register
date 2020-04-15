@@ -274,7 +274,7 @@ class AdminGUI:
 
                 self.student_professor_entry.config(state='normal')
                 self.student_professor_entry.delete(0, 'end')
-                self.student_professor_entry.insert(0, prof.result[1])
+                self.student_professor_entry.insert(0, prof.result[2])
                 self.student_professor_entry.config(state='readonly')
             else:
                 # clean the field
@@ -337,11 +337,14 @@ class AdminGUI:
         # update combobox course of screens
         self.student_course_name_entry.config(values=self.courses)
         self.professor_course_entry.config(values=self.courses)
+
         if self.var.get() == enum.UserTypes.PROFESSOR.name:
             self.canvas_student.pack_forget()
             self.canvas_course.pack_forget()
             self.canvas_professor.pack(fill="x")
+            self.professor_course_name_entry.config(state="normal")
             self.professor_course_name_entry.insert(0, self.nameCourse)
+            self.professor_course_name_entry.config(state="readonly")
 
             self.bottom_separator.pack_forget()
             self.bottom_separator.pack(fill="x", padx=5, pady=5)
@@ -424,16 +427,20 @@ class AdminGUI:
             type = self.var.get()
             idProf = self.student_professor_number
 
-            if int(stdGrade) < 0 or int(stdGrade) > 100:
-                self.message['text'] = ""
-                self.message['text'] = "The grade have to be between 0 an 100."
+            if stdGrade != "":
+                stdGrade = int(stdGrade)
+
+                if stdGrade < 0 or int(stdGrade) > 100:
+                    self.message['text'] = ""
+                    self.message['text'] = "The grade have to be between 0 an 100."
+                    return
+
+            if stdNumber and stdName and stdCourse and stdUsername and stdPassword:
+                std = admServ.save_student(stdNumber, stdName, stdCourse, stdGrade,
+                                           stdUser, stdUsername, stdPassword, type, idProf)
+                self.message['text'] = std
             else:
-                if stdNumber and stdName and stdCourse and stdUsername and stdPassword:
-                    std = admServ.save_student(stdNumber, stdName, stdCourse, stdGrade,
-                                               stdUser, stdUsername, stdPassword, type, idProf)
-                    self.message['text'] = std
-                else:
-                    self.message['text'] = "Please enter all fields to save."
+                self.message['text'] = "Please enter all fields to save."
 
     def find(self):
         if self.var.get() == enum.UserTypes.COURSE.name:
@@ -447,21 +454,29 @@ class AdminGUI:
         elif self.var.get() == enum.UserTypes.PROFESSOR.name:
 
             prof = admServ.find_professor(self.professor_number_entry.get())
-            course = admServ.find_course(prof.result[2])
-            user = admServ.find_user(self.professor_number_entry.get())
-
-            # clear all fields
-            self.new()
-            if prof.result is not "":
-                self.professor_number_entry.insert(0, prof.result[0])
-                self.professor_name_entry.insert(0, prof.result[1])
-                self.prof_course_var.set(prof.result[2])
-                self.professor_course_name_entry.insert(0, course.result[1])
-                self.professor_username_entry.insert(0, user.result[1])
-                self.professor_password_entry.insert(0, user.result[2])
-
-            if prof.msg is not None:
+            if prof.msg:
+                self.message['text'] = ""
                 self.message['text'] = prof.msg
+            else:
+                course = admServ.find_course(prof.result[1])
+                user = admServ.find_user(self.professor_number_entry.get())
+
+                # clear all fields
+                self.new()
+                if prof.result is not "":
+                    self.professor_number_entry.insert(0, prof.result[0])
+                    self.professor_name_entry.insert(0, prof.result[2])
+                    self.prof_course_var.set(prof.result[1])
+                    self.nameCourse = course.result[1]
+                    self.professor_course_name_entry.config(state="normal")
+                    self.professor_course_name_entry.delete(0, 'end')
+                    self.professor_course_name_entry.insert(0, course.result[1])
+                    self.professor_course_name_entry.config(state="readonly")
+                    self.professor_username_entry.insert(0, user.result[1])
+                    self.professor_password_entry.insert(0, user.result[2])
+
+                if prof.msg is not None:
+                    self.message['text'] = prof.msg
 
         else:
             self.student_name_entry.delete(0, 'end')
@@ -476,8 +491,12 @@ class AdminGUI:
                 if std.result[5]:
                     prof = admServ.find_professor(std.result[5])
                     if prof:
+                        self.student_professor_number_entry.config(state="normal")
                         self.student_professor_number_entry.insert(0, prof.result[0])
+                        self.student_professor_number_entry.config(state="readonly")
+                        self.student_professor_entry.config(state="normal")
                         self.student_professor_entry.insert(0, prof.result[2])
+                        self.student_professor_entry.config(state="readonly")
                         # set variable value
                         self.student_professor_number = prof.result[0]
                 if std.result[3]:
@@ -535,7 +554,11 @@ class AdminGUI:
             self.professor_name_entry.delete(0, 'end')
             if self.courses:
                 self.professor_course_entry.current(0)
+
+            self.professor_course_name_entry.config(state="normal")
             self.professor_course_name_entry.delete(0, 'end')
+            self.professor_course_name_entry.insert(0,self.nameCourse)
+            self.professor_course_name_entry.config(state="readonly")
             self.professor_username_entry.delete(0, 'end')
             self.professor_password_entry.delete(0, 'end')
 
@@ -543,8 +566,12 @@ class AdminGUI:
             self.student_number_entry.delete(0, 'end')
             self.student_name_entry.delete(0, 'end')
             self.student_grade_entry.delete(0, 'end')
+            self.student_professor_entry.config(state="normal")
             self.student_professor_entry.delete(0, 'end')
+            self.student_professor_entry.config(state="readonly")
+            self.student_professor_number_entry.config(state="normal")
             self.student_professor_number_entry.delete(0, 'end')
+            self.student_professor_number_entry.config(state="readonly")
             if self.courses:
                 self.student_course_name_entry.current(0)
             self.student_password_entry.delete(0, 'end')

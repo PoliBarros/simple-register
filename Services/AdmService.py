@@ -313,7 +313,7 @@ def save_professor(idProf, nameProf, courseCodeProf, usename, password, type):
         conn = db.connect()
         cursor = conn.conn.cursor()
         # verify professor
-        cursor.execute("SELECT * FROM Professor WHERE idProf= %s", (idProf,))
+        cursor.execute("SELECT * FROM Professor WHERE idProf= %s and courseCodeProf = %s", (idProf, courseCodeProf))
         professor = cursor.fetchone()
         ret = AdmReturn()
 
@@ -336,7 +336,7 @@ def save_professor(idProf, nameProf, courseCodeProf, usename, password, type):
 
             if student is not None:
                 # Verify if the course is given by the professor
-                if professor[2] != courseCodeProf:
+                if professor[1] != courseCodeProf:
                     # update user
                     insert_update_user(idProf, usename, password, type, True)
                     # update professor
@@ -348,7 +348,9 @@ def save_professor(idProf, nameProf, courseCodeProf, usename, password, type):
                     ret.msg = "Professor updated"
                     return ret
                 else:
-                    return "Can be updated. This professor is linked with a student grade."
+                    ret.result = ""
+                    ret.msg = "Can't be updated. This professor is linked with a student grade."
+                    return ret
             else:
                 # update user
                 insert_update_user(idProf, usename, password, type, True)
