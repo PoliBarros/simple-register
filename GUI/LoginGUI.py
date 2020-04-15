@@ -84,6 +84,11 @@ class LoginGUI:
         self.main_window.bind('<Return>', self.login)
         self.btn_login.bind('<Button-1>', self.login)
 
+        if err is not None or err != "":
+            self.error_message_label['text'] = ""
+            self.error_message_label.pack()
+            self.error_message_label['text'] = err
+
         tkinter.mainloop()
 
     def login(self, event):
@@ -107,5 +112,5 @@ class LoginGUI:
 
 
 # create schema
-db.connect()
+err = db.connect()
 loginGui = LoginGUI()

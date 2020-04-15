@@ -3,28 +3,33 @@ from mysql.connector import Error
 
 
 def connect():
-    connection = mysql.connector.connect(host='localhost', user='root', password='')
+    try:
+        connection = mysql.connector.connect(host='localhost', user='root', password='')
 
-    cursor = connection.cursor()
-    cursor.execute("SHOW DATABASES")
+        cursor = connection.cursor()
+        cursor.execute("SHOW DATABASES")
 
-    databases = cursor.fetchall()
-    dbName = None
+        databases = cursor.fetchall()
+        dbName = None
 
-    for db in databases:
-        if db[0] == "proj_emerging_tech":
-            dbName = "proj_emerging_tech"
-            break
+        for db in databases:
+            if db[0] == "proj_emerging_tech":
+                dbName = "proj_emerging_tech"
+                break
 
-    if dbName is not None:
-        connection = mysql.connector.connect(host='localhost', user='root', password='', database=dbName)
-    else:
-        create_db()
+        if dbName is not None:
+            connection = mysql.connector.connect(host='localhost', user='root', password='', database=dbName)
+        else:
+            create_db()
 
-    if connection.is_connected():
-        version = connection.get_server_info()
-        print("Connected to MySQL Server version ", version)
-        return connection
+    except Error as e:
+        print("Error while connecting to MySQL", e)
+        return "Error while connecting to MySQL"
+
+    finally:
+        if connection.is_connected():
+            version = connection.get_server_info()
+            print("Connected to MySQL Server version ", version)
 
 
 def create_db():
@@ -33,13 +38,14 @@ def create_db():
         # create database
         db_cursor = connection.cursor()
         db_cursor.execute("CREATE DATABASE IF NOT EXISTS proj_emerging_tech")
-        create_tables()
 
     except Error as e:
         print("Error while creating database to MySQL", e)
+        return "Error while creating database"
 
     finally:
         if connection.is_connected():
+            create_tables()
             db_cursor.close()
             connection.close()
             print("Database created")
@@ -86,9 +92,13 @@ def create_tables():
 
         # Insert adm user in table
         cursor.execute("INSERT IGNORE INTO User (userId, username, password, type)" +
-                       " VALUES (00001, 'adm', 1234, 'ADM)")
+                       " VALUES (00001, 'adm', 1234, 'ADM')")
 
         connection.commit()
+
+    except Error as e:
+        print("Error while creating tables to MySQL", e)
+        return "Error while creating tables"
 
     finally:
         if connection.is_connected():

@@ -49,7 +49,7 @@ def login(username, password, type, login_main):
                 prof.ProfessorGUI(win, result[0])
 
         else:
-            return "No user found"
+            return "User not found"
 
     except Error as e:
         print("Error while connecting to MySQL", e)
