@@ -2,7 +2,14 @@ import mysql.connector
 from mysql.connector import Error
 
 
+class DbReturn:
+    conn = ""
+    msg = ""
+
+
 def connect():
+    ret = DbReturn()
+
     try:
         connection = mysql.connector.connect(host='localhost', user='root', password='')
 
@@ -24,15 +31,23 @@ def connect():
 
     except Error as e:
         print("Error while connecting to MySQL", e)
-        return "Error while connecting to MySQL"
+        ret.msg = "Error while connecting to MySQL"
+        ret.conn = ""
+        return ret
 
     finally:
         if connection.is_connected():
             version = connection.get_server_info()
             print("Connected to MySQL Server version ", version)
+            ret.msg = ""
+            ret.conn = connection
+            return ret
 
 
 def create_db():
+
+    ret = DbReturn()
+
     connection = mysql.connector.connect(host='localhost', user='root', password='')
     try:
         # create database
@@ -41,7 +56,9 @@ def create_db():
 
     except Error as e:
         print("Error while creating database to MySQL", e)
-        return "Error while creating database"
+        ret.msg = "Error while creating database"
+        ret.conn = ""
+        return ret
 
     finally:
         if connection.is_connected():
@@ -52,6 +69,9 @@ def create_db():
 
 
 def create_tables():
+
+    ret = DbReturn()
+
     connection = mysql.connector.connect(host='localhost', user='root', password='', database="proj_emerging_tech")
     try:
         cursor = connection.cursor()
@@ -98,7 +118,9 @@ def create_tables():
 
     except Error as e:
         print("Error while creating tables to MySQL", e)
-        return "Error while creating tables"
+        ret.msg = "Error while creating tables"
+        ret.conn = ""
+        return ret
 
     finally:
         if connection.is_connected():

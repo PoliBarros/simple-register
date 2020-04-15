@@ -11,7 +11,7 @@ class ProfReturn:
 def find_professor(idProf):
     try:
         conn = db.connect()
-        cursor = conn.cursor()
+        cursor = conn.conn.cursor()
         cursor.execute("SELECT nameProf FROM Professor WHERE idProf= %s", (idProf,))
         prof = cursor.fetchone()
 
@@ -26,9 +26,9 @@ def find_professor(idProf):
         return "An error occurred while searching"
 
     finally:
-        if conn.is_connected():
+        if conn.conn.is_connected():
             cursor.close()
-            conn.close()
+            conn.conn.close()
             print("Connection is closed")
 
 
@@ -36,7 +36,7 @@ def find_student(idStd, profId):
     ret = ProfReturn()
     try:
         conn = db.connect()
-        cursor = conn.cursor()
+        cursor = conn.conn.cursor()
         cursor.execute("SELECT * FROM Student WHERE idStudents= %s and profIdStd = %s", (idStd, profId))
         std = cursor.fetchall()
 
@@ -67,9 +67,9 @@ def find_student(idStd, profId):
         return
 
     finally:
-        if conn.is_connected():
+        if conn.conn.is_connected():
             cursor.close()
-            conn.close()
+            conn.conn.close()
             print("Connection is closed")
 
 
@@ -77,7 +77,7 @@ def find_course(code):
     ret = ProfReturn()
     try:
         conn = db.connect()
-        cursor = conn.cursor()
+        cursor = conn.conn.cursor()
         if code is not None:
             cursor.execute("SELECT courseName FROM Course WHERE courseCode= %s", (code,))
             course = cursor.fetchone()
@@ -98,9 +98,9 @@ def find_course(code):
         return ret
 
     finally:
-        if conn.is_connected():
+        if conn.conn.is_connected():
             cursor.close()
-            conn.close()
+            conn.conn.close()
             print("Connection is closed")
 
 
@@ -110,10 +110,10 @@ def save(stdId, grade, course):
 
     try:
         conn = db.connect()
-        cursor = conn.cursor()
+        cursor = conn.conn.cursor()
         if stdId and grade and course:
             cursor.execute("UPDATE Student SET grade = %s WHERE profIdStd = %s AND courseCodeStd = %s", data)
-            conn.commit()
+            conn.conn.commit()
 
             ret.msg = "Grade updated"
             return ret
@@ -124,9 +124,9 @@ def save(stdId, grade, course):
         return ret
 
     finally:
-        if conn.is_connected():
+        if conn.conn.is_connected():
             cursor.close()
-            conn.close()
+            conn.conn.close()
             print("Connection is closed")
 
 

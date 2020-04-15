@@ -9,7 +9,7 @@ def get_std_grades_by_user_id(userId, login_main):
     try:
 
         conn = db.connect()
-        cursor = conn.cursor()
+        cursor = conn.conn.cursor()
         cursor.execute("SELECT * FROM Student WHERE userIdStd = %s", (userId, ))
         result = cursor.fetchall()
 
@@ -24,9 +24,9 @@ def get_std_grades_by_user_id(userId, login_main):
     except Error as e:
         print("Error while connecting to MySQL", e)
     finally:
-        if conn.is_connected():
+        if conn.conn.is_connected():
             cursor.close()
-            conn.close()
+            conn.conn.close()
             print("Connection is closed")
 
 

@@ -20,7 +20,7 @@ def login(username, password, type, login_main):
         data = (username, password, type)
 
         conn = db.connect()
-        cursor = conn.cursor()
+        cursor = conn.conn.cursor()
         cursor.execute("SELECT * FROM User WHERE username = %s " +
                        "AND password = %s " +
                        "AND type = %s", data)
@@ -54,8 +54,8 @@ def login(username, password, type, login_main):
     except Error as e:
         print("Error while connecting to MySQL", e)
     finally:
-        if conn.is_connected():
+        if conn.conn.is_connected():
             cursor.close()
-            conn.close()
+            conn.conn.close()
             print("Connection is closed")
 

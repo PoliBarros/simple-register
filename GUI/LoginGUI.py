@@ -39,7 +39,7 @@ class LoginGUI:
         # Type selection
         self.type_label = tkinter.Label(self.frame1, text="Select the type: ")
         self.type_entry = ttk.Combobox(self.frame1, textvariable=self.var_type, values=self.return_types)
-        self.type_entry.current(2)
+        self.type_entry.current(0)
 
         # Login data
         self.login_label = tkinter.Label(self.frame2, text='Login:')
@@ -84,10 +84,10 @@ class LoginGUI:
         self.main_window.bind('<Return>', self.login)
         self.btn_login.bind('<Button-1>', self.login)
 
-        if err is not None or err != "":
+        if err.msg is not None or err.msg != "":
             self.error_message_label['text'] = ""
             self.error_message_label.pack()
-            self.error_message_label['text'] = err
+            self.error_message_label['text'] = err.msg
 
         tkinter.mainloop()
 
