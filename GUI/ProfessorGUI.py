@@ -23,6 +23,7 @@ class ProfessorGUI():
 
         self.var_student_number.trace('w', self.only_numbers)
         self.var_student_number.trace('w', self.maxlenght)
+        self.var_grade.trace('w', self.only_numbers)
 
         # FRAMES
         self.professor_frame1 = tkinter.Frame(self.main_window)
@@ -127,6 +128,10 @@ class ProfessorGUI():
             corrected = ''.join(filter(str.isdigit, self.var_student_number.get()))
             self.var_student_number.set(corrected)
 
+        elif not self.var_grade.get().isdigit():
+            corrected = ''.join(filter(str.isdigit, self.var_grade.get()))
+            self.var_grade.set(corrected)
+
     def select_course(self, *event):
         ret = profServ.find_course(self.var_course_combo.get())
         if ret.course:
@@ -222,14 +227,27 @@ class ProfessorGUI():
         self.changeInputType("", "", False)
 
     def save_grade(self):
+
         if self.var_course_entry.get():
             course = self.var_course_entry.get()
         else:
             course = self.var_course_combo.get()
 
-        ret = profServ.save(self.id_professor, self.var_grade.get(), course)
-        if ret.msg:
-            self.message['text'] = ret.msg
+        if self.var_grade.get():
+            grade = int(self.var_grade.get())
+
+            if grade < 0 or grade > 100:
+                self.message['text'] = ""
+                self.message['text'] = "The grade have to be between 0 an 100."
+            else:
+                ret = profServ.save(self.id_professor, self.var_grade.get(), course)
+                if ret.msg:
+                    self.message['text'] = ret.msg
+
+
+        else:
+            self.message['text'] = ""
+            self.message['text'] = "Nothing was updated."
 
     def close_prof(self):
         self.main_window.destroy()
